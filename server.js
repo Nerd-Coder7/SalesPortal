@@ -38,7 +38,7 @@ require("./config/passport.js");
 app.use(express.static(path.join(__dirname, "build")));
 
 // Define a route for handling requests to the root URL
-app.get("/", (req, res) => {
+app.get("/*", (req, res) => {
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 app.get("/server-status", (req, res) => {
