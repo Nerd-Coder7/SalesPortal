@@ -5,7 +5,7 @@ const app = express();
 const cors = require("cors");
 const morgan = require("morgan");
 const passport = require("passport");
-
+const path = require("path");
 const PORT = process.env.PORT || 4000;
 //Routes:-
 const Database = require("./config/database");
