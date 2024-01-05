@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkmy_app=self.webpackChunkmy_app||[]).push([[170],{6170:(e,a,n)=>{n.r(a),n.d(a,{default:()=>s});n(2791);var p=n(184);const s=function(){return(0,p.jsx)("div",{children:"BlankPage"})}}}]);
+//# sourceMappingURL=170.7b6ac270.chunk.js.map

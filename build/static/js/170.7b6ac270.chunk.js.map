@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/170.7b6ac270.chunk.js","mappings":"kJAMA,QAJA,WACE,OAAOA,EAAAA,EAAAA,KAAA,OAAAC,SAAK,aACd,C","sources":["pages/BlankPage.tsx"],"sourcesContent":["import React from \"react\";\n\nfunction BlankPage() {\n  return <div>BlankPage</div>;\n}\n\nexport default BlankPage;\n"],"names":["_jsx","children"],"sourceRoot":""}
