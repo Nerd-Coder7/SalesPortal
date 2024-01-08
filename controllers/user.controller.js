@@ -321,5 +321,14 @@ const getUser = async (req, res, next) => {
   }
 };
 
+const getUsers = async (req, res, next) => {
+  try {
+    const user = await userModel.find();
+    res.status(200).json(user);
+  } catch (err) {
+    next(err);
+  }
+};
 
-module.exports = { addUser, signin, refreshToken,logout, updateInfo, getUser };
+
+module.exports = { addUser,getUsers, signin, refreshToken,logout, updateInfo, getUser };

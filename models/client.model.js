@@ -7,7 +7,6 @@ const clientSchema= new mongoose.Schema({
     clientEmail:String,
     clientSkype:String,
     clientPhone:String,
-    status:{type:String,enum:["new","discussion","hired","completed","rejected","follow_up","pause","spam"]},
     invited:Boolean,
     notes:String
 });

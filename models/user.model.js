@@ -39,6 +39,7 @@ target:{
 type:Number,
 default:null
 },
+profilesAllocated:[{type:mongoose.Schema.Types.ObjectId,ref:"profile"}],
     role: {
       type: String,
       default: "member",

@@ -13,10 +13,13 @@ const proposalSchema= new mongoose.Schema({
     cost:{ type: Number, required: true },
     estimatedHours:{type:String},
     recievedAmount:Number,
-    proposalDate:{type:Date,required:true},
+    proposalDate:{type:Date,default:Date.now()},
     totalConnects:{type:Number},
     proposalDesc:String,
-    proposal:{type:String}
-});
+    proposal:{type:String},
+    status:{type:String,enum:["new","discussion","hired","completed","rejected","follow_up","pause","spam"]},
+    creator:{type:mongoose.Schema.Types.ObjectId,ref:"User",required:true},
+    client:{type:mongoose.Schema.Types.ObjectId,ref:"client",required:true}
+},{timestamps:true});
 
 module.exports = mongoose.model("proposal",proposalSchema);
