@@ -192,11 +192,7 @@ const signin = async (req, res, next) => {
         refreshToken,
         accessTokenUpdatedAt: new Date().toLocaleString(),
         user: {
-          _id: existingUser._id,
-          name: existingUser.name,
-          email: existingUser.email,
-          role: existingUser.role,
-          avatar: existingUser.avatar,
+         ...existingUser._doc
         },
       });
   } catch (err) {
@@ -287,20 +283,20 @@ const logout = async (req, res) => {
 
 const updateInfo = async (req, res) => {
   try {
-    const user = await userModel.findById(req.userId);
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
+    const user = await userModel.findByIdAndUpdate({_id:req.params.id},{...req.body},{new:true});
+    // if (!user) {
+    //   return res.status(404).json({
+    //     message: "User not found",
+    //   });
+    // }
 
-    const { location, interests, bio } = req.body;
+    // const { location, interests, bio } = req.body;
 
-    user.location = location;
-    user.interests = interests;
-    user.bio = bio;
+    // user.location = location;
+    // user.interests = interests;
+    // user.bio = bio;
 
-    await user.save();
+    // await user.save();
 
     res.status(200).json({
       message: "User info updated successfully",
@@ -320,15 +316,38 @@ const getUser = async (req, res, next) => {
     next(err);
   }
 };
-
-const getUsers = async (req, res, next) => {
+const deleteUser = async (req, res, next) => {
   try {
-    const user = await userModel.find();
+    const user = await userModel.findByIdAndDelete({_id:req.params.id})
+    res.status(200).json("Deketed successfully");
+  } catch (err) {
+    next(err);
+  }
+};
+const updateUserInfo = async (req, res, next) => {
+  const {password,location,phoneNumber,avatar}=req.body;
+  const salt = await bcrypt.genSalt(10);
+ const hashedpassword = await bcrypt.hash(password, salt);
+  try {
+    let user;
+    if(password){
+     user = await userModel.findByIdAndUpdate({_id:req.params.id},{avatar,password:hashedpassword,location,phoneNumber},{new:true})}
+     user = await userModel.findByIdAndUpdate({_id:req.params.id},{avatar,location,phoneNumber},{new:true})
     res.status(200).json(user);
   } catch (err) {
     next(err);
   }
 };
 
+const getUsers = async (req, res, next) => {
+  try {
+    const user = await userModel.find().populate("profilesAllocated","profileName");
+    res.status(200).json(user);
+  } catch (err) {
+    console.log(err)
+    next(err);
+  }
+};
 
-module.exports = { addUser,getUsers, signin, refreshToken,logout, updateInfo, getUser };
+
+module.exports = { addUser,getUsers,updateUserInfo, signin, refreshToken,logout, updateInfo, getUser, deleteUser };

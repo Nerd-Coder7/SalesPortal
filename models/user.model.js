@@ -14,6 +14,9 @@ const userSchema = new Schema(
       unique: true,
       trim: true,
     },
+    phoneNumber: {
+      type: String,default:""
+    },
     password: {
       type: String,
       required: true,
@@ -37,9 +40,9 @@ const userSchema = new Schema(
     },
 target:{
 type:Number,
-default:null
+default:0
 },
-profilesAllocated:[{type:mongoose.Schema.Types.ObjectId,ref:"profile"}],
+profilesAllocated:[{type:mongoose.Schema.Types.ObjectId,ref:"portalProfile"}],
     role: {
       type: String,
       default: "member",

@@ -19,7 +19,8 @@ const proposalSchema= new mongoose.Schema({
     proposal:{type:String},
     status:{type:String,enum:["new","discussion","hired","completed","rejected","follow_up","pause","spam"]},
     creator:{type:mongoose.Schema.Types.ObjectId,ref:"User",required:true},
-    client:{type:mongoose.Schema.Types.ObjectId,ref:"client",required:true}
+    client:{type:mongoose.Schema.Types.ObjectId,ref:"client",required:true},
+    connectsCost:{type:Number,default:0.15}
 },{timestamps:true});
 
 module.exports = mongoose.model("proposal",proposalSchema);

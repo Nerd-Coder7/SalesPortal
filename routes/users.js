@@ -15,7 +15,7 @@ const avatarUpload = require("../middlewares/users/avatarUpload");
 const {
     signUpSignInLimiter
   } = require("../middlewares/limiter/limiter");
-const { addUser, signin, refreshToken, logout, updateInfo, getUser, getUsers } = require("../controllers/user.controller");
+const { addUser, signin, refreshToken, logout, updateInfo, getUser, getUsers, deleteUser, updateUserInfo } = require("../controllers/user.controller");
 const requireAuth = passport.authenticate("jwt", { session: false }, null);
 const decodeToken = require("../middlewares/auth/decodeToken");
 router.post("/signup",signUpSignInLimiter,avatarUpload,addUserValidator,addUserValidatorHandler,addUser);
@@ -31,6 +31,8 @@ router.post(
   router.post("/refresh-token", refreshToken);
   router.post("/logout", logout);
   router.get("/", getUsers);
-  router.get("/:id", requireAuth, getUser);
-  router.put("/:id", requireAuth, decodeToken, updateInfo);
+  router.get("/:id", getUser);
+  router.delete("/:id", deleteUser);
+  router.put("/:id", updateInfo);
+  router.patch("/:id", updateUserInfo);
   module.exports = router;
