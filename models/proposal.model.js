@@ -12,7 +12,7 @@ const proposalSchema= new mongoose.Schema({
     currency:String,
     cost:{ type: Number, required: true },
     estimatedHours:{type:String},
-    recievedAmount:Number,
+    receivedAmount:Number,
     proposalDate:{type:Date,default:Date.now()},
     totalConnects:{type:Number},
     proposalDesc:String,
