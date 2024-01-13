@@ -30,7 +30,7 @@ const getSingleProposal = async (req, res) => {
       .populate("portal", "portalName") // Populate the 'portal' field with 'portalName'
       .populate("jobCategory", "jobName")
       .populate("profile", "profileName")
-      .populate("client", "clientName");
+      .populate("client", "clientName").sort({createdAt:-1});
     res.status(200).json(data);
   } catch (err) {
     res.status(500).json({
@@ -92,6 +92,236 @@ const removeProposal = async (req, res) => {
   }
 };
 
+// const getAllStats = async (req, res) => {
+//   const currentDate = new Date();
+//   const startOfMonth = new Date(
+//     currentDate.getFullYear(),
+//     currentDate.getMonth(),
+//     1
+//   );
+//   console.log(currentDate, startOfMonth);
+
+//   // Get stats for the current month
+//   const monthlyStats = await Proposal.aggregate([
+//     {
+//       $match: {
+//         proposalDate: { $gte: startOfMonth, $lte: currentDate },
+//       },
+//     },
+//     {
+//       $group: {
+//         _id: null,
+//         totalConnects: { $sum: "$totalConnects" },
+//         totalSales: { $sum: "$cost" },
+//         totalMoneyUsedOnConnects: {
+//           $sum: { $multiply: ["$totalConnects", "$connectsCost"] },
+//         },
+//         totalProposals: { $sum: 1 },
+//         totalReceivedAmount: { $sum: "$receivedAmount" },
+//       },
+//     },
+//   ]);
+
+//   // Get stats for all time
+//   const allTimeStats = await Proposal.aggregate([
+//     {
+//       $group: {
+//         _id: null,
+//         totalConnects: { $sum: "$totalConnects" },
+//         totalSales: { $sum: "$cost" },
+//         totalMoneyUsedOnConnects: {
+//           $sum: { $multiply: ["$totalConnects", "$connectsCost"] },
+//         },
+//         totalProposals: { $sum: 1 },
+//         totalReceivedAmount: { $sum: "$receivedAmount" },
+//       },
+//     },
+//   ]);
+
+//   // Get stats for the current year
+//   const currentYearStats = await Proposal.aggregate([
+//     {
+//       $match: {
+//         proposalDate: { $gte: new Date(currentDate.getFullYear(), 0, 1), $lte: currentDate },
+//       },
+//     },
+//     {
+//       $group: {
+//         _id: null,
+//         totalConnects: { $sum: "$totalConnects" },
+//         totalSales: { $sum: "$cost" },
+//         totalMoneyUsedOnConnects: {
+//           $sum: { $multiply: ["$totalConnects", "$connectsCost"] },
+//         },
+//         totalProposals: { $sum: 1 },
+//         totalReceivedAmount: { $sum: "$receivedAmount" },
+//       },
+//     },
+//   ]);
+
+//   // Extract the results
+//   const monthlyResult = monthlyStats[0] || {
+//     totalConnects: 0,
+//     totalSales: 0,
+//     totalMoneyUsedOnConnects: 0,
+//     totalProposals: 0,
+//     totalReceivedAmount: 0,
+//   };
+
+//   const allTimeResult = allTimeStats[0] || {
+//     totalConnects: 0,
+//     totalSales: 0,
+//     totalMoneyUsedOnConnects: 0,
+//     totalProposals: 0,
+//     totalReceivedAmount: 0,
+//   };
+
+//   const currentYearResult = currentYearStats[0] || {
+//     totalConnects: 0,
+//     totalSales: 0,
+//     totalMoneyUsedOnConnects: 0,
+//     totalProposals: 0,
+//     totalReceivedAmount: 0,
+//   };
+
+//   res.status(200).send({
+//     monthly: monthlyResult,
+//     allTime: allTimeResult,
+//     currentYear: currentYearResult,
+//   });
+// };
+
+// const getAllStats = async (req, res) => {
+//   const currentDate = new Date();
+//   const startOfMonth = new Date(
+//     currentDate.getFullYear(),
+//     currentDate.getMonth(),
+//     1
+//   );
+
+//   // Get stats for the current month
+//   const monthlyStats = await Proposal.aggregate([
+//     {
+//       $match: {
+//         proposalDate: { $gte: startOfMonth, $lte: currentDate },
+//       },
+//     },
+//     {
+//       $addFields: {
+//         totalCost: {
+//           $cond: {
+//             if: { $eq: ["$proposalType", "hourly"] },
+//             then: { $multiply: ["$cost", { $toInt: "$estimatedHours" }] },
+//             else: "$cost",
+//           },
+//         },
+//       },
+//     },
+//     {
+//       $group: {
+//         _id: null,
+//         totalConnects: { $sum: "$totalConnects" },
+//         totalSales: { $sum: "$totalCost" },
+//         totalMoneyUsedOnConnects: {
+//           $sum: { $multiply: ["$totalConnects", "$connectsCost"] },
+//         },
+//         totalProposals: { $sum: 1 },
+//         totalReceivedAmount: { $sum: "$receivedAmount" },
+//       },
+//     },
+//   ]);
+
+//   // Get stats for all time
+//   const allTimeStats = await Proposal.aggregate([
+//     {
+//       $addFields: {
+//         totalCost: {
+//           $cond: {
+//             if: { $eq: ["$proposalType", "hourly"] },
+//             then: { $multiply: ["$cost", { $toInt: "$estimatedHours" }] },
+//             else: "$cost",
+//           },
+//         },
+//       },
+//     },
+//     {
+//       $group: {
+//         _id: null,
+//         totalConnects: { $sum: "$totalConnects" },
+//         totalSales: { $sum: "$totalCost" },
+//         totalMoneyUsedOnConnects: {
+//           $sum: { $multiply: ["$totalConnects", "$connectsCost"] },
+//         },
+//         totalProposals: { $sum: 1 },
+//         totalReceivedAmount: { $sum: "$receivedAmount" },
+//       },
+//     },
+//   ]);
+
+//   // Get stats for the current year
+//   const currentYearStats = await Proposal.aggregate([
+//     {
+//       $match: {
+//         proposalDate: { $gte: new Date(currentDate.getFullYear(), 0, 1), $lte: currentDate },
+//       },
+//     },
+//     {
+//       $addFields: {
+//         totalCost: {
+//           $cond: {
+//             if: { $eq: ["$proposalType", "hourly"] },
+//             then: { $multiply: ["$cost", { $toInt: "$estimatedHours" }] },
+//             else: "$cost",
+//           },
+//         },
+//       },
+//     },
+//     {
+//       $group: {
+//         _id: null,
+//         totalConnects: { $sum: "$totalConnects" },
+//         totalSales: { $sum: "$totalCost" },
+//         totalMoneyUsedOnConnects: {
+//           $sum: { $multiply: ["$totalConnects", "$connectsCost"] },
+//         },
+//         totalProposals: { $sum: 1 },
+//         totalReceivedAmount: { $sum: "$receivedAmount" },
+//       },
+//     },
+//   ]);
+
+//   // Extract the results
+//   const monthlyResult = monthlyStats[0] || {
+//     totalConnects: 0,
+//     totalSales: 0,
+//     totalMoneyUsedOnConnects: 0,
+//     totalProposals: 0,
+//     totalReceivedAmount: 0,
+//   };
+
+//   const allTimeResult = allTimeStats[0] || {
+//     totalConnects: 0,
+//     totalSales: 0,
+//     totalMoneyUsedOnConnects: 0,
+//     totalProposals: 0,
+//     totalReceivedAmount: 0,
+//   };
+
+//   const currentYearResult = currentYearStats[0] || {
+//     totalConnects: 0,
+//     totalSales: 0,
+//     totalMoneyUsedOnConnects: 0,
+//     totalProposals: 0,
+//     totalReceivedAmount: 0,
+//   };
+
+//   res.status(200).send({
+//     monthly: monthlyResult,
+//     allTime: allTimeResult,
+//     currentYear: currentYearResult,
+//   });
+// };
+
 const getAllStats = async (req, res) => {
   const currentDate = new Date();
   const startOfMonth = new Date(
@@ -99,7 +329,6 @@ const getAllStats = async (req, res) => {
     currentDate.getMonth(),
     1
   );
-  console.log(currentDate, startOfMonth);
 
   // Get stats for the current month
   const monthlyStats = await Proposal.aggregate([
@@ -109,10 +338,28 @@ const getAllStats = async (req, res) => {
       },
     },
     {
+      $addFields: {
+        totalCost: {
+          $cond: {
+            if: {
+              $and: [
+                { $eq: ["$proposalType", "hourly"] },
+                { $ne: ["$estimatedHours", ""] },
+              ],
+            },
+            then: {
+              $multiply: ["$cost", { $toInt: "$estimatedHours" }],
+            },
+            else: "$cost",
+          },
+        },
+      },
+    },
+    {
       $group: {
         _id: null,
         totalConnects: { $sum: "$totalConnects" },
-        totalSales: { $sum: "$cost" },
+        totalSales: { $sum: "$totalCost" },
         totalMoneyUsedOnConnects: {
           $sum: { $multiply: ["$totalConnects", "$connectsCost"] },
         },
@@ -125,10 +372,28 @@ const getAllStats = async (req, res) => {
   // Get stats for all time
   const allTimeStats = await Proposal.aggregate([
     {
+      $addFields: {
+        totalCost: {
+          $cond: {
+            if: {
+              $and: [
+                { $eq: ["$proposalType", "hourly"] },
+                { $ne: ["$estimatedHours", ""] },
+              ],
+            },
+            then: {
+              $multiply: ["$cost", { $toInt: "$estimatedHours" }],
+            },
+            else: "$cost",
+          },
+        },
+      },
+    },
+    {
       $group: {
         _id: null,
         totalConnects: { $sum: "$totalConnects" },
-        totalSales: { $sum: "$cost" },
+        totalSales: { $sum: "$totalCost" },
         totalMoneyUsedOnConnects: {
           $sum: { $multiply: ["$totalConnects", "$connectsCost"] },
         },
@@ -146,10 +411,28 @@ const getAllStats = async (req, res) => {
       },
     },
     {
+      $addFields: {
+        totalCost: {
+          $cond: {
+            if: {
+              $and: [
+                { $eq: ["$proposalType", "hourly"] },
+                { $ne: ["$estimatedHours", ""] },
+              ],
+            },
+            then: {
+              $multiply: ["$cost", { $toInt: "$estimatedHours" }],
+            },
+            else: "$cost",
+          },
+        },
+      },
+    },
+    {
       $group: {
         _id: null,
         totalConnects: { $sum: "$totalConnects" },
-        totalSales: { $sum: "$cost" },
+        totalSales: { $sum: "$totalCost" },
         totalMoneyUsedOnConnects: {
           $sum: { $multiply: ["$totalConnects", "$connectsCost"] },
         },
@@ -190,8 +473,6 @@ const getAllStats = async (req, res) => {
     currentYear: currentYearResult,
   });
 };
-
-
 
 module.exports = {
   getAllStats,
