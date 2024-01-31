@@ -8,9 +8,9 @@ const proposalSchema= new mongoose.Schema({
     proposalTitle:{ type: String, required: true },
     proposalLink:String,
     url:String,
-    proposalType:{type:String,enum:["hourly","fixed"],required:true},
+    proposalType:{type:String,enum:["hourly","fixed","-"],default:"-"},
     currency:String,
-    cost:{ type: Number, required: true },
+    cost:{ type: Number },
     estimatedHours:{type:String},
     receivedAmount:Number,
     proposalDate:{type:Date,default:Date.now()},
@@ -19,7 +19,7 @@ const proposalSchema= new mongoose.Schema({
     proposal:{type:String},
     status:{type:String,enum:["new","discussion","hired","completed","rejected","follow_up","pause","spam"]},
     creator:{type:mongoose.Schema.Types.ObjectId,ref:"User",required:true},
-    client:{type:mongoose.Schema.Types.ObjectId,ref:"client",required:true},
+    client:{type:mongoose.Schema.Types.ObjectId,ref:"client"},
     connectsCost:{type:Number,default:0.15}
 },{timestamps:true});
 

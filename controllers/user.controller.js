@@ -284,19 +284,6 @@ const logout = async (req, res) => {
 const updateInfo = async (req, res) => {
   try {
     const user = await userModel.findByIdAndUpdate({_id:req.params.id},{...req.body},{new:true});
-    // if (!user) {
-    //   return res.status(404).json({
-    //     message: "User not found",
-    //   });
-    // }
-
-    // const { location, interests, bio } = req.body;
-
-    // user.location = location;
-    // user.interests = interests;
-    // user.bio = bio;
-
-    // await user.save();
 
     res.status(200).json({
       message: "User info updated successfully",

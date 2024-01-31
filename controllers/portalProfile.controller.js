@@ -8,6 +8,7 @@ const PortalProfile = require("../models/portalProfile.model");
 
 const getPortalProfile = async (req, res) => {
   try {
+  
     const data = await PortalProfile.find().populate('portal', 'portalName') // Populate the 'portal' field with 'portalName'
     .populate('jobCategory', 'jobName');;
     res.status(200).json(data);

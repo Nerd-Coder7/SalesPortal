@@ -1,5 +1,6 @@
 const Proposal = require("../models/proposal.model");
-
+const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Types;
 // Proposal Routes
 
 /**
@@ -8,7 +9,13 @@ const Proposal = require("../models/proposal.model");
 
 const getProposal = async (req, res) => {
   try {
-    const data = await Proposal.find()
+    const { id } = req.query;
+    const query = {}; 
+
+    if (id) {
+      query.creator = id; 
+    }
+    const data = await Proposal.find(query)
       .populate("creator", "name")
       .populate("portal", "portalName") // Populate the 'portal' field with 'portalName'
       .populate("jobCategory", "jobName")
@@ -45,7 +52,14 @@ const getSingleProposal = async (req, res) => {
 
 const createProposal = async (req, res) => {
   try {
-    const newProposal = await Proposal.create({ ...req.body });
+ const {client,...others}=req.body;
+ let newProposal ;
+ if(client){
+  newProposal = await Proposal.create({ ...req.body });
+
+ }else{
+  newProposal = await Proposal.create({ ...others });
+ }
 
     res.status(201).json(newProposal);
   } catch (err) {
@@ -323,6 +337,8 @@ const removeProposal = async (req, res) => {
 // };
 
 const getAllStats = async (req, res) => {
+  const {id}=req.query;
+  console.log(req.params)
   const currentDate = new Date();
   const startOfMonth = new Date(
     currentDate.getFullYear(),
@@ -330,13 +346,19 @@ const getAllStats = async (req, res) => {
     1
   );
 
+  const match = {
+    $match: {
+      proposalDate: { $gte: startOfMonth, $lte: currentDate },
+    },
+  };
+  
+  if (id) {
+    match.$match.creator = new ObjectId(id);
+  }
+console.log(match)
   // Get stats for the current month
   const monthlyStats = await Proposal.aggregate([
-    {
-      $match: {
-        proposalDate: { $gte: startOfMonth, $lte: currentDate },
-      },
-    },
+    match,
     {
       $addFields: {
         totalCost: {
