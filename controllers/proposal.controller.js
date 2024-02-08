@@ -10,14 +10,14 @@ const { ObjectId } = mongoose.Types;
 const getProposal = async (req, res) => {
   try {
     const { id } = req.query;
-    const query = {}; 
+    const query = {};
 
     if (id) {
-      query.creator = id; 
+      query.creator = id;
     }
     const data = await Proposal.find(query)
       .populate("creator", "name")
-      .populate("portal", "portalName") // Populate the 'portal' field with 'portalName'
+      .populate("portal", "portalName") 
       .populate("jobCategory", "jobName")
       .populate("profile", "profileName")
       .populate("client", "clientName");
@@ -34,10 +34,11 @@ const getSingleProposal = async (req, res) => {
   try {
     const data = await Proposal.findById({ _id: ProposalId })
       .populate("creator", "name")
-      .populate("portal", "portalName") // Populate the 'portal' field with 'portalName'
+      .populate("portal", "portalName") 
       .populate("jobCategory", "jobName")
       .populate("profile", "profileName")
-      .populate("client", "clientName").sort({createdAt:-1});
+      .populate("client", "clientName")
+      .sort({ createdAt: -1 });
     res.status(200).json(data);
   } catch (err) {
     res.status(500).json({
@@ -52,14 +53,13 @@ const getSingleProposal = async (req, res) => {
 
 const createProposal = async (req, res) => {
   try {
- const {client,...others}=req.body;
- let newProposal ;
- if(client){
-  newProposal = await Proposal.create({ ...req.body });
-
- }else{
-  newProposal = await Proposal.create({ ...others });
- }
+    const { client, ...others } = req.body;
+    let newProposal;
+    if (client) {
+      newProposal = await Proposal.create({ ...req.body });
+    } else {
+      newProposal = await Proposal.create({ ...others });
+    }
 
     res.status(201).json(newProposal);
   } catch (err) {
@@ -336,29 +336,201 @@ const removeProposal = async (req, res) => {
 //   });
 // };
 
-const getAllStats = async (req, res) => {
+const getParticularStats=async(req,res)=>{
   const {id}=req.query;
-  console.log(req.params)
   const currentDate = new Date();
+  const startOfWeek = new Date(currentDate);
+startOfWeek.setDate(startOfWeek.getDate() - currentDate.getDay());
   const startOfMonth = new Date(
     currentDate.getFullYear(),
     currentDate.getMonth(),
     1
   );
-
-  const match = {
+  const weeklyMatch = {
+    $match: {
+      proposalDate: { $gte: startOfWeek, $lte: currentDate },
+    },
+  };
+  const monthlyMatch = {
     $match: {
       proposalDate: { $gte: startOfMonth, $lte: currentDate },
     },
   };
-  
+
   if (id) {
-    match.$match.creator = new ObjectId(id);
+    weeklyMatch.$match.creator = new ObjectId(id); 
+    monthlyMatch.$match.creator = new ObjectId(id); 
   }
-console.log(match)
-  // Get stats for the current month
+
+  const weeklyStats = await Proposal.aggregate([
+    weeklyMatch,
+    {
+      $addFields: {
+        totalCost: {
+          $cond: {
+            if: {
+              $and: [
+                { $eq: ["$proposalType", "hourly"] },
+                { $ne: ["$estimatedHours", ""] },
+              ],
+            },
+            then: {
+              $multiply: ["$cost", { $toInt: "$estimatedHours" }],
+            },
+            else: "$cost",
+          },
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalConnects: { $sum: "$totalConnects" },
+        totalSales: { $sum: "$totalCost" },
+        totalMoneyUsedOnConnects: {
+          $sum: { $multiply: ["$totalConnects", "$connectsCost"] },
+        },
+        totalProposals: { $sum: 1 },
+        totalReceivedAmount: { $sum: "$receivedAmount" },
+      },
+    },
+  ]);
+
   const monthlyStats = await Proposal.aggregate([
-    match,
+    monthlyMatch,
+    {
+      $addFields: {
+        totalCost: {
+          $cond: {
+            if: {
+              $and: [
+                { $eq: ["$proposalType", "hourly"] },
+                { $ne: ["$estimatedHours", ""] },
+              ],
+            },
+            then: {
+              $multiply: ["$cost", { $toInt: "$estimatedHours" }],
+            },
+            else: "$cost",
+          },
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalConnects: { $sum: "$totalConnects" },
+        totalSales: { $sum: "$totalCost" },
+        totalMoneyUsedOnConnects: {
+          $sum: { $multiply: ["$totalConnects", "$connectsCost"] },
+        },
+        totalProposals: { $sum: 1 },
+        totalReceivedAmount: { $sum: "$receivedAmount" },
+      },
+    },
+  ]);
+
+  const weeklyResult = weeklyStats[0] || {
+    totalConnects: 0,
+    totalSales: 0,
+    totalMoneyUsedOnConnects: 0,
+    totalProposals: 0,
+    totalReceivedAmount: 0,
+  };
+  const monthlyResult = monthlyStats[0] || {
+    totalConnects: 0,
+    totalSales: 0,
+    totalMoneyUsedOnConnects: 0,
+    totalProposals: 0,
+    totalReceivedAmount: 0,
+  };
+
+  res.status(200).send({
+    weekly:weeklyResult,
+    monthly: monthlyResult
+  });
+
+}
+
+const getAllStats = async (req, res) => {
+  const { id } = req.query;
+  console.log(req.params);
+  const currentDate = new Date();
+  const startOfWeek = new Date(currentDate);
+startOfWeek.setDate(startOfWeek.getDate() - currentDate.getDay());
+  const startOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1
+  );
+  const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
+  
+  const weeklyMatch = {
+    $match: {
+      proposalDate: { $gte: startOfWeek, $lte: currentDate },
+    },
+  };
+  const monthlyMatch = {
+    $match: {
+      proposalDate: { $gte: startOfMonth, $lte: currentDate },
+    },
+  };
+  const yearlyMatch = {
+    $match: {
+      proposalDate: { $gte: startOfYear, $lte: currentDate },
+    },
+  };
+  const allTimeMatch = {
+    $match: {
+     
+    },
+  };
+
+  if (id) {
+    weeklyMatch.$match.creator = new ObjectId(id); 
+    monthlyMatch.$match.creator = new ObjectId(id); 
+    yearlyMatch.$match.creator = new ObjectId(id);
+    allTimeMatch.$match.creator = new ObjectId(id);
+  }
+
+console.log(yearlyMatch)
+
+  // Get stats for the current month
+  const weeklyStats = await Proposal.aggregate([
+    weeklyMatch,
+    {
+      $addFields: {
+        totalCost: {
+          $cond: {
+            if: {
+              $and: [
+                { $eq: ["$proposalType", "hourly"] },
+                { $ne: ["$estimatedHours", ""] },
+              ],
+            },
+            then: {
+              $multiply: ["$cost", { $toInt: "$estimatedHours" }],
+            },
+            else: "$cost",
+          },
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalConnects: { $sum: "$totalConnects" },
+        totalSales: { $sum: "$totalCost" },
+        totalMoneyUsedOnConnects: {
+          $sum: { $multiply: ["$totalConnects", "$connectsCost"] },
+        },
+        totalProposals: { $sum: 1 },
+        totalReceivedAmount: { $sum: "$receivedAmount" },
+      },
+    },
+  ]);
+  const monthlyStats = await Proposal.aggregate([
+    monthlyMatch,
     {
       $addFields: {
         totalCost: {
@@ -393,6 +565,7 @@ console.log(match)
 
   // Get stats for all time
   const allTimeStats = await Proposal.aggregate([
+    allTimeMatch,
     {
       $addFields: {
         totalCost: {
@@ -427,11 +600,7 @@ console.log(match)
 
   // Get stats for the current year
   const currentYearStats = await Proposal.aggregate([
-    {
-      $match: {
-        proposalDate: { $gte: new Date(currentDate.getFullYear(), 0, 1), $lte: currentDate },
-      },
-    },
+    yearlyMatch,
     {
       $addFields: {
         totalCost: {
@@ -465,6 +634,13 @@ console.log(match)
   ]);
 
   // Extract the results
+  const weeklyResult = weeklyStats[0] || {
+    totalConnects: 0,
+    totalSales: 0,
+    totalMoneyUsedOnConnects: 0,
+    totalProposals: 0,
+    totalReceivedAmount: 0,
+  };
   const monthlyResult = monthlyStats[0] || {
     totalConnects: 0,
     totalSales: 0,
@@ -490,6 +666,7 @@ console.log(match)
   };
 
   res.status(200).send({
+    weekly:weeklyResult,
     monthly: monthlyResult,
     allTime: allTimeResult,
     currentYear: currentYearResult,
@@ -503,4 +680,5 @@ module.exports = {
   createProposal,
   updateProposal,
   removeProposal,
+  getParticularStats
 };

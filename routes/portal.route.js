@@ -17,7 +17,7 @@ const {
   createPortalProfile,
   updatePortalProfile,
 } = require("../controllers/portalProfile.controller");
-const { getProposal, createProposal, updateProposal, removeProposal, getSingleProposal, getAllStats } = require("../controllers/proposal.controller");
+const { getProposal, createProposal, updateProposal, removeProposal, getSingleProposal, getAllStats, getParticularStats } = require("../controllers/proposal.controller");
 
 const router = require("express").Router();
 
@@ -49,6 +49,7 @@ router.delete("/remove_client/:ClientId",removeClient );
 
 //Proposals:
 router.get("/stats", getAllStats);
+router.get("/userstats", getParticularStats);
 router.get("/proposals", getProposal);
 router.get("/proposal/:ProposalId", getSingleProposal);
 router.post("/create_proposal", createProposal);

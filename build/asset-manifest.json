@@ -1,9 +1,9 @@
 {
   "files": {
     "main.css": "/static/css/main.1db07295.css",
-    "main.js": "/static/js/main.25d587ac.js",
+    "main.js": "/static/js/main.ce85c39a.js",
     "static/css/960.34c2dee4.chunk.css": "/static/css/960.34c2dee4.chunk.css",
-    "static/js/960.e62963b9.chunk.js": "/static/js/960.e62963b9.chunk.js",
+    "static/js/960.753a16f2.chunk.js": "/static/js/960.753a16f2.chunk.js",
     "static/js/949.13af8c28.chunk.js": "/static/js/949.13af8c28.chunk.js",
     "static/js/170.7b6ac270.chunk.js": "/static/js/170.7b6ac270.chunk.js",
     "static/css/911.e673e7b0.chunk.css": "/static/css/911.e673e7b0.chunk.css",
@@ -43,9 +43,9 @@
     "static/media/Reset password-pana.svg": "/static/media/Reset password-pana.a27ad1a331b20150700408e1a10921fa.svg",
     "index.html": "/index.html",
     "main.1db07295.css.map": "/static/css/main.1db07295.css.map",
-    "main.25d587ac.js.map": "/static/js/main.25d587ac.js.map",
+    "main.ce85c39a.js.map": "/static/js/main.ce85c39a.js.map",
     "960.34c2dee4.chunk.css.map": "/static/css/960.34c2dee4.chunk.css.map",
-    "960.e62963b9.chunk.js.map": "/static/js/960.e62963b9.chunk.js.map",
+    "960.753a16f2.chunk.js.map": "/static/js/960.753a16f2.chunk.js.map",
     "949.13af8c28.chunk.js.map": "/static/js/949.13af8c28.chunk.js.map",
     "170.7b6ac270.chunk.js.map": "/static/js/170.7b6ac270.chunk.js.map",
     "911.e673e7b0.chunk.css.map": "/static/css/911.e673e7b0.chunk.css.map",
@@ -57,6 +57,6 @@
   },
   "entrypoints": [
     "static/css/main.1db07295.css",
-    "static/js/main.25d587ac.js"
+    "static/js/main.ce85c39a.js"
   ]
 }
