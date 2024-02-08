@@ -16,7 +16,7 @@ const contextAuthRoutes = require("./routes/context-auth.route");
 const { notFound, errorHandler } = require('./middlewares/error.js');
 
 
-const db = new Database(process.env.MONGODB_URI);
+const db = new Database(process.env.MONGODB_URI,{ useNewUrlParser: true, useUnifiedTopology: true });
 
 db.connect().catch((err) =>
   console.error("Error connecting to database:", err)
